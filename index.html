@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speaking Cards — Warm-up</title>
+  <style>
+    :root {
+      --cream: #fef4e6;
+      --yellow: #ffd84d;
+      --yellow-soft: #ffe99a;
+      --navy: #142b55;
+      --green: #79b86a;
+      --red: #e94c4c;
+      --text: #1e2d43;
+      --white: #fffdf8;
+      --shadow: 0 18px 45px rgba(20, 43, 85, .12);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Trebuchet MS", "Arial Rounded MT Bold", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 10% 8%, rgba(255,216,77,.35) 0 70px, transparent 71px),
+        radial-gradient(circle at 94% 90%, rgba(255,216,77,.28) 0 100px, transparent 101px),
+        var(--cream);
+      overflow-x: hidden;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 28px 0 42px;
+      position: relative;
+    }
+
+    .doodle { position: absolute; color: #e4b800; font-weight: 900; opacity: .9; user-select: none; }
+    .doodle.one { left: -4px; top: 90px; font-size: 30px; transform: rotate(-12deg); }
+    .doodle.two { right: 8px; top: 55px; font-size: 26px; transform: rotate(15deg); }
+    .doodle.three { right: 18px; bottom: 110px; font-size: 38px; transform: rotate(10deg); }
+
+    header {
+      text-align: center;
+      padding: 8px 12px 22px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 9px 20px;
+      border-radius: 999px;
+      background: var(--yellow);
+      color: var(--navy);
+      font-size: 18px;
+      font-weight: 800;
+      transform: rotate(-2deg);
+      box-shadow: 5px 6px 0 rgba(20,43,85,.08);
+    }
+
+    h1 {
+      margin: 14px 0 8px;
+      font-size: clamp(42px, 7vw, 78px);
+      line-height: .95;
+      letter-spacing: -2px;
+      color: var(--navy);
+    }
+
+    .subtitle {
+      margin: 0 auto;
+      max-width: 700px;
+      font-size: clamp(16px, 2.1vw, 21px);
+      line-height: 1.45;
+      opacity: .88;
+    }
+
+    .levels {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 18px 0 24px;
+    }
+
+    .level-btn {
+      border: 3px solid transparent;
+      background: var(--white);
+      border-radius: 26px;
+      padding: 18px 18px 16px;
+      min-height: 128px;
+      cursor: pointer;
+      text-align: left;
+      box-shadow: var(--shadow);
+      transition: .22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .level-btn:hover { transform: translateY(-3px) rotate(-.5deg); }
+    .level-btn.active { border-color: var(--navy); transform: translateY(-4px); }
+    .level-btn::after {
+      content: "";
+      position: absolute;
+      width: 95px; height: 95px;
+      border-radius: 50%;
+      right: -28px; bottom: -38px;
+      opacity: .22;
+    }
+    .level-btn.easy::after { background: var(--green); }
+    .level-btn.think::after { background: var(--yellow); }
+    .level-btn.challenge::after { background: var(--red); }
+
+    .level-title { font-size: 30px; font-weight: 900; margin-bottom: 7px; color: var(--navy); }
+    .level-desc { font-size: 14px; line-height: 1.35; max-width: 260px; }
+
+    .game {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    .card-area {
+      min-height: 650px;
+      background: rgba(255,253,248,.72);
+      border: 2px solid rgba(20,43,85,.08);
+      border-radius: 34px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 3px 4px 14px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 900;
+      background: var(--yellow-soft);
+      color: var(--navy);
+    }
+    .counter { font-size: 14px; font-weight: 800; opacity: .7; }
+
+    .card-shell {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+
+    .card-slot {
+      width: min(430px, 100%);
+      aspect-ratio: 750 / 1080;
+      max-height: 560px;
+      border: 3px dashed #d7c99c;
+      border-radius: 28px;
+      background: #fffaf0;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 10px 28px rgba(20,43,85,.06);
+    }
+
+    #cardImage {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 0;
+      box-shadow: 0 22px 55px rgba(20,43,85,.17);
+      background: transparent;
+    }
+
+    .empty {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 40px;
+      background: #fffaf0;
+    }
+
+    [hidden] { display: none !important; }
+    .empty h2 { margin: 0 0 10px; font-size: 32px; color: var(--navy); }
+    .empty p { margin: 0; font-size: 16px; line-height: 1.45; max-width: 420px; }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-top: 16px;
+    }
+
+    .primary, .secondary {
+      border: 0;
+      border-radius: 18px;
+      padding: 14px 20px;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+    .primary { background: var(--yellow); color: var(--navy); box-shadow: 0 8px 0 #e2b914; }
+    .primary:hover { transform: translateY(-2px); }
+    .primary:active { transform: translateY(3px); box-shadow: 0 4px 0 #e2b914; }
+    .secondary { background: #fff; color: var(--navy); border: 2px solid rgba(20,43,85,.12); }
+    .secondary:hover { background: #fff9df; }
+
+    .side {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .note, .stats {
+      background: var(--white);
+      border-radius: 28px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+    .note h3, .stats h3 { margin: 0 0 10px; color: var(--navy); font-size: 24px; }
+    .note p { margin: 0; line-height: 1.5; }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat {
+      padding: 16px;
+      border-radius: 20px;
+      background: #fff8de;
+      text-align: center;
+    }
+    .stat strong { display: block; font-size: 28px; color: var(--navy); }
+    .stat span { font-size: 13px; opacity: .72; }
+
+    .tip {
+      margin-top: auto;
+      padding: 20px;
+      border-radius: 28px;
+      background: #eef7e9;
+      border: 2px dashed rgba(121,184,106,.5);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 900px) {
+      .game { grid-template-columns: 1fr; }
+      .side { display: grid; grid-template-columns: 1fr 1fr; }
+      .tip { grid-column: 1 / -1; }
+      .card-area { min-height: auto; }
+    }
+    @media (max-width: 650px) {
+      .page { width: min(100% - 18px, 1180px); padding-top: 16px; }
+      .levels { grid-template-columns: 1fr; }
+      .level-btn { min-height: 105px; }
+      .side { display: flex; }
+      .card-area { padding: 11px; border-radius: 25px; }
+      #cardImage { max-height: 64vh; }
+      h1 { letter-spacing: -1px; }
+    }
+	.site-credit {
+  text-align: center;
+  padding: 18px 16px 24px;
+  font-size: 13px;
+  color: #1f355e;
+  background: #fef4e6;
+  }
+/* TIMER */
+
+.timer-card {
+  margin-top: 18px;
+  padding: 20px 16px 18px;
+  background: #fffdf8;
+  border-radius: 24px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(31, 53, 94, 0.08);
+}
+
+.timer-card h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  color: #14356b;
+}
+
+.timer-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 130px;
+  height: 70px;
+  margin: 0 auto 16px;
+
+  background: #fff5cf;
+  border-radius: 20px;
+
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #14356b;
+
+  box-shadow: inset 0 0 0 1px #f3df98;
+}
+
+.timer-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.timer-btn {
+  border: none;
+  border-radius: 14px;
+
+  padding: 10px 18px;
+
+  background: #ffd84d;
+  color: #14356b;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 3px 0 #e8bd18;
+
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.timer-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #e8bd18;
+}
+
+.timer-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #e8bd18;
+}
+
+.timer-reset {
+  border: 1px solid #e4dfd3;
+  border-radius: 12px;
+
+  padding: 8px 15px;
+
+  background: #ffffff;
+  color: #14356b;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  cursor: pointer;
+}
+  </style>
+</head>
+<body>
+  <main class="page">
+    <span class="doodle one">✦</span>
+    <span class="doodle two">〰</span>
+    <span class="doodle three">♡</span>
+
+    <header>
+      <div class="eyebrow">Speaking warm-up ✏️</div>
+      <h1>Challenge Cards</h1>
+      <p class="subtitle">Choose a level, get a random speaking card and start talking.</p>
+    </header>
+
+    <section class="levels" aria-label="Levels">
+      <button class="level-btn easy active" data-level="easy">
+        <div class="level-title">EASY</div>
+        <div class="level-desc">An easy way to get back into English after the holidays.</div>
+      </button>
+      <button class="level-btn think" data-level="think">
+        <div class="level-title">THINK</div>
+        <div class="level-desc">A little more detail and ideas.</div>
+      </button>
+      <button class="level-btn challenge" data-level="challenge">
+        <div class="level-title">CHALLENGE</div>
+        <div class="level-desc">A more challenging task for confident speakers.</div>
+      </button>
+    </section>
+
+    <section class="game">
+      <div class="card-area">
+        <div class="card-top">
+          <div class="badge" id="levelBadge">EASY</div>
+          <div class="counter" id="counter">0 / 6 cards used</div>
+        </div>
+
+        <div class="card-shell" id="cardShell">
+          <div class="card-slot">
+            <div class="empty" id="emptyState">
+              <div>
+                <h2>Ready?</h2>
+                <p>Click <b>“Draw a card”</b> and a random speaking card will appear here.</p>
+              </div>
+            </div>
+            <img id="cardImage" alt="Speaking card" hidden />
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="primary" id="drawBtn">Draw a card</button>
+          <button class="secondary" id="resetBtn">Reset this level</button>
+        </div>
+      </div>
+
+      <aside class="side">
+        <div class="note">
+          <h3>How to play</h3>
+          <p>Choose a level → get a card → speak about the task. Once a card appears, it is removed from the current deck, so it will not repeat.</p>
+        </div>
+
+        <div class="stats">
+          <h3>Progress</h3>
+          <div class="stats-grid">
+            <div class="stat"><strong id="usedStat">0</strong><span>used</span></div>
+            <div class="stat"><strong id="leftStat">6</strong><span>left</span></div>
+          </div>
+        </div>
+<div class="card timer-card">
+  <h2>Timer</h2>
+
+  <div class="timer-display" id="timerDisplay">00:30</div>
+
+  <div class="timer-buttons">
+    <button class="timer-btn" onclick="startTimer(30)">30 sec</button>
+    <button class="timer-btn" onclick="startTimer(60)">1 min</button>
+  </div>
+
+  <button class="timer-reset" onclick="resetTimer()">Reset timer</button>
+</div>
+        <div class="tip" id="finishTip">
+          💡 When all cards in the level have been used, click <b>Reset this level</b> to start again.
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    // Файлы лежат рядом с HTML в папке images/easy, images/think, images/challenge.
+    // Чтобы заменить карточки, просто замените картинки, сохранив эти имена,
+    // либо измените массивы ниже.
+    const decks = {
+      easy: [
+        'images/easy/easy_1.png', 'images/easy/easy_2.png', 'images/easy/easy_3.png',
+        'images/easy/easy_4.png', 'images/easy/easy_5.png', 'images/easy/easy_6.png'
+      ],
+      think: [
+        'images/think/think_1.png', 'images/think/think_2.png', 'images/think/think_3.png',
+        'images/think/think_4.png', 'images/think/think_5.png', 'images/think/think_6.png'
+      ],
+      challenge: [
+        'images/challenge/challenge_1.png', 'images/challenge/challenge_2.png', 'images/challenge/challenge_3.png',
+        'images/challenge/challenge_4.png', 'images/challenge/challenge_5.png', 'images/challenge/challenge_6.png'
+      ]
+    };
+
+    const state = {
+      level: 'easy',
+      remaining: {},
+      used: {}
+    };
+
+    Object.keys(decks).forEach(level => {
+      state.remaining[level] = [...decks[level]];
+      state.used[level] = [];
+    });
+
+    const img = document.getElementById('cardImage');
+    const empty = document.getElementById('emptyState');
+    const levelBadge = document.getElementById('levelBadge');
+    const counter = document.getElementById('counter');
+    const usedStat = document.getElementById('usedStat');
+    const leftStat = document.getElementById('leftStat');
+    const drawBtn = document.getElementById('drawBtn');
+
+    function prettyLevel(level) {
+      return level.toUpperCase();
+    }
+
+    function updateUI() {
+      const level = state.level;
+      const total = decks[level].length;
+      const used = state.used[level].length;
+      const left = state.remaining[level].length;
+
+      levelBadge.textContent = prettyLevel(level);
+      counter.textContent = `${used} / ${total} cards used`;
+      usedStat.textContent = used;
+      leftStat.textContent = left;
+
+      drawBtn.disabled = left === 0;
+      drawBtn.textContent = left === 0 ? 'Deck finished' : 'Draw a card';
+      drawBtn.style.opacity = left === 0 ? '.55' : '1';
+      drawBtn.style.cursor = left === 0 ? 'not-allowed' : 'pointer';
+
+      document.querySelectorAll('.level-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.level === level);
+      });
+    }
+
+    function drawCard() {
+      const level = state.level;
+      const remaining = state.remaining[level];
+      if (!remaining.length) return;
+
+      const randomIndex = Math.floor(Math.random() * remaining.length);
+      const [src] = remaining.splice(randomIndex, 1);
+      state.used[level].push(src);
+
+      img.src = src;
+      img.hidden = false;
+      empty.hidden = true;
+      img.alt = `${prettyLevel(level)} speaking card`;
+      updateUI();
+    }
+
+    function resetLevel() {
+      const level = state.level;
+      state.remaining[level] = [...decks[level]];
+      state.used[level] = [];
+      img.hidden = true;
+      empty.hidden = false;
+      updateUI();
+    }
+
+    document.querySelectorAll('.level-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.level = btn.dataset.level;
+        img.hidden = true;
+        empty.hidden = false;
+        updateUI();
+      });
+    });
+
+    drawBtn.addEventListener('click', drawCard);
+    document.getElementById('resetBtn').addEventListener('click', resetLevel);
+
+    updateUI();
+	// TIMER
+
+let timerInterval = null;
+let timerSeconds = 30;
+
+function startTimer(seconds) {
+  clearInterval(timerInterval);
+
+  timerSeconds = seconds;
+  updateTimerDisplay();
+
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+
+    updateTimerDisplay();
+
+    if (timerSeconds <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerSeconds = 0;
+      updateTimerDisplay();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const minutes = Math.floor(timerSeconds / 60);
+  const seconds = timerSeconds % 60;
+
+  document.getElementById("timerDisplay").textContent =
+    `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function resetTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timerSeconds = 30;
+  updateTimerDisplay();
+}
+
+updateTimerDisplay();
+  </script>
+  <footer class="site-credit">
+  Сайт создан ВК сообществом: Агафонова Людмила | Блог учителя английского
+</footer>
+</body>
+</html>
